@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VgramApp</title>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+ 	<link rel="stylesheet" type="text/css" href="/css/vgram.css">
+ 	<script src="https://kit.fontawesome.com/8e82e704c0.js" crossorigin="anonymous"></script>
+ 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+	<div class="container">
+		<div class="navbar-brand">Vgram</div>
+  		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="fa fa-ellipsis-v" ></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+  		  	<div class="navbar-nav ml-auto mt-2 mt-lg-0">
+  		  		<% if(currentUser){ %>
+  		  			<a class="nav-link active" href="/user/<%= currentUser._id %>">Hello <%= currentUser.username %></a>
+  		  		<% } %>
+  		  		<a class="nav-link" href="/">Home</a>
+  		  	  	<a class="nav-link" href="/profile">Post Something New</a>
+  		  	  	<% if(!currentUser){ %>
+  		  	  	  	<a class="nav-link" href="/user">Login</a>
+  		  	  	<% } else { %>
+  		  	  		<a class="nav-link" href="/logout">Logout</a>
+  		  	  	<% } %>
+  		  	</div>
+  		</div>
+	</div>
+</nav>
+
+<div class="container main2">
+	<div class="box3" style="margin: 70px auto;width:60%;">
+		<span><%= vgram.name %> | <%= moment(vgram.createdAt).fromNow() %></span><br>
+		<a href="<%= vgram.image%>"><img src="<%= vgram.image %>"></a>
+		<br>
+		<% if(currentUser && vgram.author.id.equals(currentUser._id)){ %>
+			<a href="/vgram/<%= vgram._id %>/edit" style="display:inline;">
+        		<button class="btn btn-secondary"><i class="fa fa-edit"></i></button>
+        	</a>
+        	<form class="delete-form" action="/vgram/<%= vgram._id %>?_method=DELETE" method="POST" style="display:inline;">
+        		<button class="btn btn-secondary"><span></span><i class="fa fa-trash"></i></button>
+        	</form>
+		<% } %>
+			<a href="/vgram" style="display:inline;">
+				<button class="btn btn-secondary">Go Back <i class="fa fa-arrow-circle-left"></i></button>
+			</a>
+      <div style="display:inline;float: right;">
+      <form action="/vgram/<%= vgram._id %>/like" method="POST" style="display: inline;">
+        <div class="btn-group">
+          <% if (currentUser && vgram.likes.some(function (like) {
+            return like.equals(currentUser._id)
+          })) { %>
+          <button class="btn btn-sm btn-primary">
+            <i class="fas fa-heart"></i>
+          </button>
+          <% } else { %>
+          <button class="btn btn-sm btn-secondary">
+            <i class="fas fa-heart"></i>
+          </button>
+          <% } %>
+        </div>
+      </form>
+      <button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#mymodal1" style="display: inline;">
+        <%= vgram.likes.length %>
+      </button>
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="mymodal1" tabindex="-1" aria-labelledby="mymodal1Label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          <%= vgram.name %> | Liked By    
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <%if(vgram.likes.length==0){%>
+          <h6>No Likes Yet</h6>
+        <% } else if(vgram.likes.length==1) { %>
+          <% vgram.likes.forEach(function(data){ %>
+            <a href="/user/<%= data.id %>" style="color:black;"><%= data.username %></a>
+          <% }); %>
+        <% } else { %>
+          <% vgram.likes.forEach(function(data){ %>
+            <a href="/user/<%= data.id %>" style="color:black;"><%= data.username %></a>
+            <hr>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+		<div class="card" style="margin-top: 15px;">
+			<form class="inform1" action="/vgram/<%= vgram._id %>/comments" method="POST">
+          		<div class="row">
+            		<input id="inputform" class="form-control col-md-10 col-12" type="text" name="comment[text]" placeholder="Comment here..." style="box-shadow: none;">
+            		<button class="btn btn-secondary col-md-2 col-12 inverted" type="submit">Post</button>
+            	</div>
+            </form>
+		</div>
+		<div class="row inform2 shadow" style="padding: 10px 0px;">
+        <% vgram.comments.forEach(function(comment){ %>
+          <div class="col-md-12">
+            <strong><%= comment.author.username %> </strong>
+            <span class="incomment" style="float: right;">
+              <%= moment(comment.createdAt).fromNow() %> <br>
+              <% if(currentUser && comment.author.id.equals(currentUser._id)){ %>
+                <form class="delete-form" action="/vgram/<%=vgram._id%>/comments/<%=comment._id%>?_method=DELETE" method="POST">
+                  <button type="submit" class="close" value="Delete" style="outline:none;">
+                    <span>&times;</span>
+                  </button>
+                </form>
+              <% } %>
+            </span>
+            <p>
+              <%= comment.text %>
+            </p>
+          </div>
+        <% }); %>
+        </div>
+	</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VgramApp</title>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+ 	<!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"> -->
+ 	<link rel="stylesheet" type="text/css" href="/css/vgram.css">
+ 	<script src="https://kit.fontawesome.com/8e82e704c0.js" crossorigin="anonymous"></script>
+ 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+	<div class="container">
+		<div class="navbar-brand">Vgram</div>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+    		<span class="fa fa-ellipsis-v" ></span>
+  		</button>
+  		<div class="collapse navbar-collapse" id="navbarNav">
+  		  	<div class="navbar-nav  ml-auto mt-2 mt-lg-0">
+  		  		<% if(currentUser){ %>
+  		  			<a class="nav-link active" href="/user/<%= currentUser._id %>">Hello <%= currentUser.username %></a>
+  		  		<% } %>
+  		  	  	<a class="nav-link" href="/profile">Post Something New</a>
+              <a class="nav-link" href="#" data-toggle="modal" data-target="#mymodal1">Users</a>
+  		  	  	<% if(!currentUser){ %>
+  		  	  	  	<a class="nav-link" href="/user">Login</a>
+  		  	  	<% } else { %>
+  		  	  		<a class="nav-link" href="/logout">Logout</a>
+  		  	  	<% } %>
+  		  	</div>
+  		</div>
+	</div>
+</nav>
+<!-- Modal -->
+<div class="modal fade" id="mymodal1" tabindex="-1" role="dialog" aria-labelledby="mymodal1Label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">All Users By Post</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <% vgram.forEach(function(data){ %>
+          <div class="row">
+            <div class="col-md-6 col-6">
+              <h6 style="text-align: center;">
+                <a href="/user/<%= data.author.id %>" style="color:rgb(60,60,60);"><%= data.name %></a>
+              </h6>
+            </div>
+            <div class="col-md-6 col-6">
+              <h6 style="float: left;">| <%= moment(data.createdAt).format("LL") %></h6><br>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box1">
+	<div class="container">
+	<% if(currentUser){ %>
+	<div class="row">
+		<div class="col-md-12 col-12" style="text-align: center;padding-top: 1%;">
+			<h6 style="display: inline;"><a href="/user/<%= currentUser._id %>" style="color: black"><%= currentUser.name %></a></h6> | <em style="display: inline;"><%= currentUser.bio %></em>
+			<div class="myicons">
+				<% if(val==true){ %>
+        <form action="/vgram" method="GET">
+          <input name="sortBy" value="oldest" class="d-none">
+          <button type="submit"><i class="fa fa-history"></i></button>
+        </form>
+        <% } %>
+        <% if(val==false){ %>
+        <form action="/vgram" method="GET">
+          <input name="sortBy" value="latest" class="d-none">
+          <button type="submit"><i class="fa fa-redo-alt"></i></button>
+        </form>
+        <% } %>
+        <form action="/vgram" method="GET">
+          <input name="sortBy" value="mostreviewed" class="d-none">
+          <button type="submit"><i class="fa fa-heart"></i></button>
+        </form>
+				<a href="/profile" style="margin-left: 1px;"><i class="fas fa-plus-circle"></i></a>
+			</div><br>
+		</div>
+	</div>
+	<% }else{ %>
+	<div class="row">
+		<div class="col-md-12 col-12" style="text-align: center;padding-top: 1%;">
+			<a href="/user" style="color:black;"><h6 style="margin-bottom: 0px;">Login for more features <span id="hidebox1text">and surfing through the photos!</span></h6></a>
+			<div class="myicons">
+        <% if(val==true){ %>
+        <form action="/vgram" method="GET">
+          <input name="sortBy" value="oldest" class="d-none">
+          <button type="submit"><i class="fa fa-history"></i></button>
+        </form>
+        <% } %>
+        <% if(val==false){ %>
+    		<form action="/vgram" method="GET">
+          <input name="sortBy" value="latest" class="d-none">
+          <button type="submit"><i class="fa fa-redo-alt"></i></button>
+        </form>
+        <% } %>
+        <form action="/vgram" method="GET">
+          <input name="sortBy" value="mostreviewed" class="d-none">
+          <button type="submit"><i class="fa fa-heart"></i></button>
+        </form>
+				<a href="/profile" style="margin-left: 1px;"><i class="fas fa-plus-circle"></i></a>
+			</div><br>
+		</div>
+	</div>
+	<% } %>
+	</div>
+</div>
+<div class="container main">
+	<section class="gallery">
+	<% vgram.forEach(function(data){ %>
+	<div class="card">
+		<img src="placeholder.svg" data-src="<%= data.image %>">
+		<div class="caption">
+			<h6><a href="/user/<%= data.author.id %>" style="cursor: pointer;color:black;"><%= data.name %></a> | <span><%= moment(data.createdAt).fromNow() %></span></h6>
+		</div>
+		<div class="middle">
+    		<a href="/vgram/<%= data._id %>">
+    			<button class="btn btn-secondary" style="background:rgba(255,255,255,0.9);border:none;">
+    				<i class="fa fa-arrow-right" style="cursor: pointer;color:rgba(50,50,50,1);"></i>
+    			</button>
+    		</a>
+    		<h5 class="text" style="padding:10px 10px 0px 10px;cursor: pointer;">
+          <a href="/user/<%= data.author.id %>" style="color:white;"><%= data.name %></a>
+        </h5>
+    		<hr style="height: 2px;border:none;background:white;margin: 0px;">
+    		<h6 style="padding: 0px;"><%= moment(data.createdAt).fromNow() %></h6>
+
+        <form action="/vgram/<%= data._id %>/like" method="POST">
+          <div class="btn-group">
+            <% if (currentUser && data.likes.some(function (like) {
+              return like.equals(currentUser._id)
+            })) { %>
+            <button class="btn btn-sm btn-primary">
+              <i class="fas fa-heart" style="color:red;"></i> <%= data.likes.length %>
+            </button>
+            <% } else { %>
+            <button class="btn btn-sm btn-secondary">
+              <i class="fas fa-heart"></i> <%= data.likes.length %>
+            </button>
+            <% } %>
+          </div>
+        </form>
+
+  		</div>
+	</div>
+	<% }); %>
+	</section>
+	<em id="lasttxt">Curated By @ Mayank Thakur</em>
+</div>
+
+<script>
+$(document).ready(function () {
+  'use strict';
+   var c, currentScrollTop = 100,
+       navbar = $('.box1');
+   $(window).scroll(function () {
+      var a = $(window).scrollTop();
+      var b = navbar.height();
+      currentScrollTop = a;
+      if (c < currentScrollTop && a > b + b) {
+        navbar.addClass("scrollUp");
+      } else if (c > currentScrollTop && !(a <= b)) {
+        navbar.removeClass("scrollUp");
+      }
+      c = currentScrollTop;
+  });
+});
+</script>
+
+<script>
+// ...the page content is above...
+
+function isVisible(elem) {
+
+  let coords = elem.getBoundingClientRect();
+
+  let windowHeight = document.documentElement.clientHeight;
+
+  // top elem edge is visible?
+  let topVisible = coords.top > 0 && coords.top < windowHeight;
+
+  // bottom elem edge is visible?
+  let bottomVisible = coords.bottom < windowHeight && coords.bottom > 0;
+
+  return topVisible || bottomVisible;
+}
+
+function showVisible() {
+  for (let img of document.querySelectorAll('img')) {
+    let realSrc = img.dataset.src;
+    if (!realSrc) continue;
+
+    if (isVisible(img)) {
+      img.src = realSrc;
+      img.dataset.src = '';
+    }
+  }
+}
+
+showVisible();
+window.onscroll = showVisible;
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

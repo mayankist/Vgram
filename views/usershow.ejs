@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VgramApp</title>
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="/css/vgram.css">
+  <script src="https://kit.fontawesome.com/8e82e704c0.js" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <div class="navbar-brand">Vgram</div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="fa fa-ellipsis-v" ></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <a class="nav-link" href="/">Home</a>
+              <a class="nav-link" href="/profile">Post Something New</a>
+              <% if(!currentUser){ %>
+                  <a class="nav-link" href="/user">Login</a>
+              <% } else { %>
+                <a class="nav-link" href="/logout">Logout</a>
+              <% } %>
+          </div>
+      </div>
+  </div>
+</nav>
+  
+  <div class="container mt-4" style="padding-top: 6vh;">    
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-3">
+      <div style="position: sticky;top:70px;">
+        <div id="profilePicture" class="card shadow-sm d-none d-md-block"> 
+            <div class="card-body">
+                <h5 class="card-title text-capitalize"><%= user.username %></h5>
+                <h6 class="card-subtitle text-muted">                
+                  <% if (vgram.length === 1) { %>
+                    <%= vgram.length %> Post
+                  <% } else { %>
+                    <%= vgram.length %> Posts
+                  <% } %> 
+                  <div><%= reviews.length %> Reviews</div>
+                </h6> 
+            </div>        
+        </div>
+        <div class="d-block d-sm-none d-none d-sm-block d-md-none mx-auto">
+          <div class="row">
+            <div class="col-8">
+              <div id="profilePicture" class="card shadow-sm" >                  
+                <div class="card-body">
+                  <h5 class="card-title text-capitalize"><%= user.username %></h5>
+                  <h6 class="card-subtitle text-muted">                    
+                    <% if (vgram.length === 1) { %>
+                      <%= vgram.length %> Post
+                    <% } else { %>
+                      <%= vgram.length %> Posts
+                    <% } %>
+                    <div>
+                      <% if (reviews.length === 1) { %>
+                        <%= reviews.length %> Review
+                      <% } else { %>
+                        <%= reviews.length %> Reviews
+                      <% } %> 
+                    </div>
+                  </h6> 
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+       
+        <div class="card shadow-sm mt-3 mb-3">
+          <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <span class="text-muted"><%= user.name %></span>          
+              </li>   
+              <li class="list-group-item">
+                <span class="text-muted"><%= user.bio %></span>             
+              </li>       
+              <li class="list-group-item">
+                <strong>Joined: </strong><span class="text-muted"><%= moment(user.joined).format('LL') %> </span>             
+              </li>              
+              <% if (currentUser && user._id.equals(currentUser._id)) { %>
+              <li class="list-group-item d-flex justify-content-center">
+                <a class="btn btn-warning btn-sm float-left mr-1" href="/user/<%= user._id %>/edit">Edit Profile</a>
+                <form class="float-left" action="/user/<%= user._id %>?_method=DELETE" method="POST">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete Account</button>
+                </form>
+              </li>
+              <% } %>             
+          </ul>
+        </div>
+      </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-9" style="margin-top: 20px;">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="tab12" data-toggle="pill" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">Your Posts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab22" data-toggle="pill" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Liked Posts</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab12">
+         
+        <div class="row">          
+          <% vgram.forEach(function(data) { %>
+            <div class="col-12 col-lg-6">
+              <div class="card shadow-sm mt-3">
+                <a href="/vgram/<%= data._id %>">
+                  <img id="campgroundCard" class="card-img-top" src="<%= data.image %>">
+                </a> 
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a href="/vgram/<%= data._id %>" class="text-capitalize" style="color:black"><%= data.name %></a>
+                    <!-- <small class="float-right text-muted"><i class="fa fa-heart"></i><%= data.likes.length %></small> -->
+                    <small class="float-right text-muted">
+                      <form action="/vgram/<%= data._id %>/like" method="POST">
+                        <div class="btn-group">
+                          <% if (currentUser && data.likes.some(function (like) {
+                            return like.equals(currentUser._id)
+                          })) { %>
+                          <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-heart"></i> <%= data.likes.length %>
+                          </button>
+                          <% } else { %>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="fas fa-heart"></i> <%= data.likes.length %>
+                          </button>
+                          <% } %>
+                        </div>
+                      </form>
+                    </small>        
+                  </h5>              
+                  <h6 class="card-subtitle">
+                    <% if(!data.comments.length) { %>
+                      <span class="text-muted">No Reviews</span>
+                    <% } else { %>
+                      <% if (data.comments.length === 1) { %>
+                        <span class="text-muted"><%= data.comments.length %> Review</span> 
+                      <% } else { %>
+                        <span class="text-muted"><%= data.comments.length %> Reviews</span> 
+                      <% } %>                
+                    <% } %>   
+                  </h6> 
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+          </div>
+          <div class="tab-pane fade show" id="tab2" role="tabpanel" aria-labelledby="tab22">
+            <h3>Hello, here are my likes!</h3>
+            <% reviews.forEach(function(data){ %>
+              <h6><%= data.text %></h6>
+            <% }); %>
+          </div>
+        </div>        
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
